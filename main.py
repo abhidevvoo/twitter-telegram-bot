@@ -7,6 +7,7 @@ import re
 from flask import Flask
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from config import Config
 
 # ====== CONFIG FILE ======
 CONFIG_FILE = "config.json"
@@ -24,23 +25,12 @@ def save_config(cfg):
 
 config = load_config()
 
-# ====== TOKENS FROM ENVIRONMENT ======
-# Support for multiple X accounts (up to 5)
-X_BEARER_TOKENS = []
-for i in range(1, 6):  # X_BEARER_TOKEN_1 through X_BEARER_TOKEN_5
-    token = os.getenv(f"X_BEARER_TOKEN_{i}")
-    if token and token != "your_x_api_bearer_token":
-        X_BEARER_TOKENS.append(token)
-
-# Fallback to single token for backward compatibility
-if not X_BEARER_TOKENS:
-    single_token = os.getenv("X_BEARER_TOKEN", "your_x_api_bearer_token")
-    if single_token != "your_x_api_bearer_token":
-        X_BEARER_TOKENS.append(single_token)
-
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "your_telegram_bot_token")
-ADMIN_ID_STR = os.getenv("ADMIN_ID", "123456789")
-ADMIN_ID = int(ADMIN_ID_STR) if ADMIN_ID_STR.strip() else 123456789   # your own Telegram user id (for security)
+# ====== CONFIGURATION ======
+# Load configuration from config.py
+X_BEARER_TOKENS = Config.X_BEARER_TOKENS
+TELEGRAM_TOKEN = Config.TELEGRAM_TOKEN or "your_telegram_bot_token"
+ADMIN_ID_STR = Config.ADMIN_ID or "123456789"
+ADMIN_ID = int(ADMIN_ID_STR) if ADMIN_ID_STR.strip() else 123456789
 
 # Telegram login users - support multiple authorized users
 AUTHORIZED_USERS = set()
@@ -505,6 +495,10 @@ if __name__ == "__main__":
     print(f"X Bearer Tokens: {len(X_BEARER_TOKENS)} configured" if X_BEARER_TOKENS else "X Bearer Tokens: NOT SET")
     print(f"Telegram Token: {'Set' if TELEGRAM_TOKEN != 'your_telegram_bot_token' else 'NOT SET'}")
     print(f"Admin ID: {ADMIN_ID}")
+    if Config.BOT_DB_URL:
+        print(f"Database URL: {'Set' if Config.BOT_DB_URL else 'NOT SET'}")
+    else:
+        print("Database URL: NOT SET")
     
     # Start Flask keepalive server
     threading.Thread(target=run_flask, daemon=True).start()
