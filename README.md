@@ -16,7 +16,7 @@ A powerful bot that monitors Twitter/X accounts and automatically forwards new t
 
 ### Environment Variables
 
-Set these in your Replit Secrets tab:
+The bot uses a centralized configuration system via `config.py`. Set these in your Replit Secrets tab:
 
 #### X/Twitter API (Required - at least 1, up to 5)
 ```
@@ -31,6 +31,11 @@ X_BEARER_TOKEN_5=your_fifth_bearer_token
 ```
 TELEGRAM_TOKEN=your_telegram_bot_token
 ADMIN_ID=your_telegram_user_id
+```
+
+#### Database Configuration (Optional)
+```
+BOT_DB_URL=your_database_connection_string
 ```
 
 ### Getting API Keys
